@@ -32,6 +32,6 @@ app.use(errorHandler);
 // Seed database on startup
 seed();
 
-app.listen(PORT, () => {
-  console.log(`Solo Pastas API corriendo en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Solo Pastas API corriendo en http://0.0.0.0:${PORT}`);
 });
