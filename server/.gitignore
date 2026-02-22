@@ -1,0 +1,4 @@
+node_modules/
+solo_pastas.db
+solo_pastas.db-wal
+solo_pastas.db-shm

@@ -1,0 +1,19 @@
+{
+  "name": "solo-pastas-server",
+  "version": "1.0.0",
+  "description": "REST API for Solo Pastas restaurant management",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.0.0",
+    "cors": "^2.8.5",
+    "decimal.js": "^10.4.3",
+    "express": "^4.21.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
