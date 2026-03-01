@@ -6,6 +6,22 @@ const router = Router();
 
 const TIPOS_VALIDOS = ['Insumo', 'Servicio', 'Otros'];
 
+// GET /api/v1/gastos?fecha=YYYY-MM-DD
+router.get('/', (req, res) => {
+  const { fecha } = req.query;
+  if (!fecha) {
+    const err = new Error('Parámetro requerido: fecha (YYYY-MM-DD)');
+    err.status = 400;
+    throw err;
+  }
+
+  const gastos = db.prepare(
+    'SELECT * FROM gastos WHERE fecha = ? ORDER BY hora DESC'
+  ).all(fecha);
+
+  res.json(gastos);
+});
+
 // POST /api/v1/gastos
 router.post('/', (req, res) => {
   const { descripcion, monto, tipo_gasto } = req.body;
@@ -31,7 +47,7 @@ router.post('/', (req, res) => {
   }
 
   const now = new Date();
-  const fecha = now.toISOString().split('T')[0];
+  const fecha = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const hora = now.toTimeString().split(' ')[0];
 
   const result = db.prepare(

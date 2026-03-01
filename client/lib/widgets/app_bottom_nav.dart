@@ -21,10 +21,6 @@ class AppBottomNav extends StatelessWidget {
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.restaurant_menu),
-          label: 'Menú',
-        ),
-        BottomNavigationBarItem(
           icon: Icon(Icons.attach_money),
           label: 'Gastos',
         ),

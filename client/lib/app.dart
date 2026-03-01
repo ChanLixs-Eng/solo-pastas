@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'config/theme.dart';
 import 'screens/home/home_screen.dart';
-import 'screens/menu/menu_screen.dart';
 import 'screens/gastos/gastos_screen.dart';
 import 'screens/personal/personal_screen.dart';
 import 'screens/reportes/reportes_screen.dart';
@@ -49,7 +48,6 @@ class _MainShellState extends State<MainShell> {
         index: _currentIndex,
         children: [
           HomeScreen(onNavigate: _onNavigate),
-          const MenuScreen(),
           const GastosScreen(),
           const PersonalScreen(),
           const ReportesScreen(),

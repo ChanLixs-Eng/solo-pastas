@@ -8,4 +8,9 @@ class PagoService {
   Future<void> registrarPago(Map<String, dynamic> body) async {
     await _http.post('/pagos', body);
   }
+
+  Future<List<Map<String, dynamic>>> getPagosHoy(String fecha) async {
+    final data = await _http.get('/pagos?fecha=$fecha');
+    return (data as List).cast<Map<String, dynamic>>();
+  }
 }

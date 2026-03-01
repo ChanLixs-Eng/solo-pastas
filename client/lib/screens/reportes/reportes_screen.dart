@@ -3,11 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../providers/dashboard_provider.dart';
 import '../../providers/reportes_provider.dart';
 import '../../widgets/cierre_card.dart';
 
-class ReportesScreen extends StatelessWidget {
+class ReportesScreen extends StatefulWidget {
   const ReportesScreen({super.key});
+
+  @override
+  State<ReportesScreen> createState() => _ReportesScreenState();
+}
+
+class _ReportesScreenState extends State<ReportesScreen> {
+  final _ingresosController = TextEditingController();
+
+  @override
+  void dispose() {
+    _ingresosController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final fecha = DateFormat('yyyy-MM-dd').format(DateTime.now());
+        context.read<ReportesProvider>().loadResumenDia(fecha);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +77,7 @@ class ReportesScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             TextField(
+              controller: _ingresosController,
               onChanged: reportes.setIngresos,
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
@@ -138,6 +164,8 @@ class ReportesScreen extends StatelessWidget {
                     : () async {
                         final ok = await reportes.cerrarCaja(fecha);
                         if (ok && context.mounted) {
+                          _ingresosController.clear();
+                          context.read<DashboardProvider>().loadTodayActivity(fecha);
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('Cierre guardado'),

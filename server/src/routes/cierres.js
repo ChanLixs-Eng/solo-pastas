@@ -4,6 +4,49 @@ const db = require('../db/database');
 
 const router = Router();
 
+// GET /api/v1/cierres?fecha=YYYY-MM-DD
+router.get('/', (req, res) => {
+  const { fecha } = req.query;
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    const err = new Error('Parámetro fecha requerido (YYYY-MM-DD)');
+    err.status = 400;
+    throw err;
+  }
+
+  const cierres = db.prepare(
+    'SELECT * FROM cierres WHERE fecha = ? ORDER BY id_cierre DESC'
+  ).all(fecha);
+
+  res.json(cierres);
+});
+
+// GET /api/v1/cierres/resumen-dia?fecha=YYYY-MM-DD
+router.get('/resumen-dia', (req, res) => {
+  const { fecha } = req.query;
+
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    const err = new Error('Parámetro fecha requerido (YYYY-MM-DD)');
+    err.status = 400;
+    throw err;
+  }
+
+  const gastosRow = db.prepare(
+    "SELECT COALESCE(SUM(CAST(monto AS REAL)), 0) AS total FROM gastos WHERE fecha = ?"
+  ).get(fecha);
+  const totalGastos = new Decimal(gastosRow.total);
+
+  const pagosRow = db.prepare(
+    "SELECT COALESCE(SUM(CAST(monto_pagado AS REAL)), 0) AS total FROM pagos WHERE fecha = ?"
+  ).get(fecha);
+  const totalPagos = new Decimal(pagosRow.total);
+
+  res.json({
+    fecha,
+    total_gastos: totalGastos.toFixed(2),
+    total_pagos: totalPagos.toFixed(2),
+  });
+});
+
 // POST /api/v1/cierres
 router.post('/', (req, res) => {
   const { ingresos_ventas, fecha } = req.body;

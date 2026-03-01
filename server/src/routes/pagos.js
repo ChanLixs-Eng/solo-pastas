@@ -6,6 +6,27 @@ const router = Router();
 
 const CONCEPTOS_VALIDOS = ['Sueldo', 'Adelanto', 'Bono'];
 
+// GET /api/v1/pagos?fecha=YYYY-MM-DD
+router.get('/', (req, res) => {
+  const { fecha } = req.query;
+  if (!fecha) {
+    const err = new Error('Parámetro requerido: fecha (YYYY-MM-DD)');
+    err.status = 400;
+    throw err;
+  }
+
+  const pagos = db.prepare(`
+    SELECT p.id_pago, p.id_personal, p.monto_pagado, p.concepto, p.fecha,
+           pe.nombre AS nombre_empleado
+    FROM pagos p
+    JOIN personal pe ON p.id_personal = pe.id_personal
+    WHERE p.fecha = ?
+    ORDER BY p.id_pago DESC
+  `).all(fecha);
+
+  res.json(pagos);
+});
+
 // POST /api/v1/pagos
 router.post('/', (req, res) => {
   const { id_personal, monto_pagado, concepto } = req.body;
@@ -37,7 +58,8 @@ router.post('/', (req, res) => {
     throw err;
   }
 
-  const fecha = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const fecha = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   db.prepare(
     'INSERT INTO pagos (id_personal, monto_pagado, concepto, fecha) VALUES (?, ?, ?, ?)'

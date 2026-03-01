@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../providers/dashboard_provider.dart';
 import '../../providers/gasto_provider.dart';
 import '../../widgets/expense_type_selector.dart';
 import '../../widgets/custom_numpad.dart';
@@ -98,8 +100,11 @@ class _GastosScreenState extends State<GastosScreen> {
                     ? null
                     : () async {
                         final messenger = ScaffoldMessenger.of(context);
+                        final dashboard = context.read<DashboardProvider>();
                         final ok = await gasto.registrarGasto();
                         if (ok && mounted) {
+                          final fecha = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                          dashboard.loadTodayActivity(fecha);
                           _descripcionController.clear();
                           messenger.showSnackBar(
                             const SnackBar(

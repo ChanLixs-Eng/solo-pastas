@@ -5,7 +5,6 @@ const errorHandler = require('./middleware/errorHandler');
 const seed = require('./db/seed');
 
 // Routes
-const productosRouter = require('./routes/productos');
 const gastosRouter = require('./routes/gastos');
 const personalRouter = require('./routes/personal');
 const pagosRouter = require('./routes/pagos');
@@ -20,7 +19,6 @@ app.use(express.json());
 app.use(auth);
 
 // Mount routes
-app.use('/api/v1/productos', productosRouter);
 app.use('/api/v1/gastos', gastosRouter);
 app.use('/api/v1/personal', personalRouter);
 app.use('/api/v1/pagos', pagosRouter);

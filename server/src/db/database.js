@@ -9,20 +9,6 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
 db.exec(`
-  CREATE TABLE IF NOT EXISTS categorias (
-    id_categoria INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL UNIQUE
-  );
-
-  CREATE TABLE IF NOT EXISTS productos (
-    id_producto INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    precio_venta TEXT NOT NULL,
-    estado INTEGER NOT NULL DEFAULT 1,
-    id_categoria INTEGER NOT NULL,
-    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria)
-  );
-
   CREATE TABLE IF NOT EXISTS personal (
     id_personal INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL,
