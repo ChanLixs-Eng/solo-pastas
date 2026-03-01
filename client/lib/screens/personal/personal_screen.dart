@@ -5,6 +5,8 @@ import '../../config/theme.dart';
 import '../../providers/personal_provider.dart';
 import '../../widgets/employee_card.dart';
 import '../../widgets/pago_dialog.dart';
+import '../../widgets/confirm_delete_dialog.dart';
+import '../../widgets/personal_dialog.dart';
 
 class PersonalScreen extends StatefulWidget {
   const PersonalScreen({super.key});
@@ -22,35 +24,87 @@ class _PersonalScreenState extends State<PersonalScreen> {
     });
   }
 
+  Future<void> _showAddDialog() async {
+    final personal = context.read<PersonalProvider>();
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => const PersonalDialog(),
+    );
+    if (result != null && mounted) {
+      final ok = await personal.createEmpleado(
+        nombre: result['nombre'] as String,
+        cargo: result['cargo'] as String,
+        sueldoBase: result['sueldo_base'] as String,
+      );
+      if (ok && mounted) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Empleado agregado'),
+            backgroundColor: AppColors.green,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _confirmDelete(PersonalProvider personal, int id, String nombre) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final confirmed = await showConfirmDeleteDialog(context, nombre);
+    if (confirmed == true && mounted) {
+      final ok = await personal.deleteEmpleado(id);
+      if (ok && mounted) {
+        messenger.showSnackBar(
+          const SnackBar(
+            content: Text('Empleado eliminado'),
+            backgroundColor: AppColors.green,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final personal = context.watch<PersonalProvider>();
 
-    return SafeArea(
-      child: Column(
-        children: [
-          const SizedBox(height: 12),
-          const Text(
-            'SOLO PASTAS',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkRed,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddDialog,
+        backgroundColor: AppColors.red,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 12),
+            const Text(
+              'SOLO PASTAS',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: AppColors.darkRed,
+              ),
             ),
-          ),
-          const Text(
-            'Personal y Pagos',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.darkText,
+            const Text(
+              'Personal y Pagos',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: AppColors.darkText,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: _buildBody(personal),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Expanded(
+              child: _buildBody(personal),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -84,7 +138,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
       onRefresh: personal.loadPersonal,
       child: ListView.builder(
         itemCount: personal.empleados.length,
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: const EdgeInsets.only(bottom: 80),
         itemBuilder: (context, index) {
           final emp = personal.empleados[index];
           return EmployeeCard(
@@ -122,6 +176,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
                 }
               }
             },
+            onDelete: () => _confirmDelete(personal, emp.idPersonal, emp.nombre),
           );
         },
       ),

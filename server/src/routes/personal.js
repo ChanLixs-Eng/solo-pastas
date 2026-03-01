@@ -46,4 +46,54 @@ router.get('/', (req, res) => {
   res.json(result);
 });
 
+// POST /api/v1/personal
+router.post('/', (req, res) => {
+  const { nombre, cargo, sueldo_base } = req.body;
+
+  if (!nombre || !cargo || !sueldo_base) {
+    const err = new Error('nombre, cargo y sueldo_base son requeridos');
+    err.status = 400;
+    throw err;
+  }
+
+  const salary = new Decimal(sueldo_base);
+  if (salary.lte(0)) {
+    const err = new Error('El sueldo base debe ser mayor a 0');
+    err.status = 400;
+    throw err;
+  }
+
+  const result = db.prepare(
+    'INSERT INTO personal (nombre, cargo, sueldo_base) VALUES (?, ?, ?)'
+  ).run(nombre.trim(), cargo.trim(), salary.toFixed(2));
+
+  res.status(201).json({
+    id_personal: result.lastInsertRowid,
+    nombre: nombre.trim(),
+    cargo: cargo.trim(),
+    sueldo_pendiente: salary.toFixed(2),
+    ultimo_pago: null,
+  });
+});
+
+// DELETE /api/v1/personal/:id
+router.delete('/:id', (req, res) => {
+  const { id } = req.params;
+
+  const existing = db.prepare('SELECT id_personal FROM personal WHERE id_personal = ?').get(id);
+  if (!existing) {
+    const err = new Error('Empleado no encontrado');
+    err.status = 404;
+    throw err;
+  }
+
+  const deleteAll = db.transaction(() => {
+    db.prepare('DELETE FROM pagos WHERE id_personal = ?').run(id);
+    db.prepare('DELETE FROM personal WHERE id_personal = ?').run(id);
+  });
+  deleteAll();
+
+  res.json({ message: 'Empleado eliminado' });
+});
+
 module.exports = router;

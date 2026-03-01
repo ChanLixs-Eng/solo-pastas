@@ -32,6 +32,40 @@ class PersonalProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> createEmpleado({
+    required String nombre,
+    required String cargo,
+    required String sueldoBase,
+  }) async {
+    _error = null;
+    try {
+      await _personalService.createPersonal({
+        'nombre': nombre,
+        'cargo': cargo,
+        'sueldo_base': sueldoBase,
+      });
+      await loadPersonal();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> deleteEmpleado(int id) async {
+    _error = null;
+    try {
+      await _personalService.deletePersonal(id);
+      await loadPersonal();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<bool> registrarPago({
     required int idPersonal,
     required Decimal monto,

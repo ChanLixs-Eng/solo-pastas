@@ -42,6 +42,16 @@ class HttpService {
     return _handleResponse(response);
   }
 
+  Future<dynamic> delete(String path) async {
+    final response = await _client
+        .delete(
+          Uri.parse('${ApiConfig.baseUrl}$path'),
+          headers: _headers,
+        )
+        .timeout(ApiConfig.timeout);
+    return _handleResponse(response);
+  }
+
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.body.isEmpty) return null;

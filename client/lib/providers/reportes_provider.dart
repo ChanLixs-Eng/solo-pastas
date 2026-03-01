@@ -34,14 +34,21 @@ class ReportesProvider extends ChangeNotifier {
 
   void setIngresos(String value) {
     _ingresosStr = value;
+    _calcularUtilidad();
     notifyListeners();
   }
 
-  void updatePreview({Decimal? gastos, Decimal? pagos}) {
-    if (gastos != null) _totalGastos = gastos;
-    if (pagos != null) _totalPagos = pagos;
-    _calcularUtilidad();
-    notifyListeners();
+  Future<void> loadResumenDia(String fecha) async {
+    try {
+      final data = await _service.getResumenDia(fecha);
+      _totalGastos = Decimal.parse(data['total_gastos'].toString());
+      _totalPagos = Decimal.parse(data['total_pagos'].toString());
+      _calcularUtilidad();
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
   }
 
   void _calcularUtilidad() {

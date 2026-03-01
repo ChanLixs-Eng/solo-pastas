@@ -5,11 +5,13 @@ import '../models/personal.dart';
 class EmployeeCard extends StatelessWidget {
   final Personal empleado;
   final VoidCallback onPagar;
+  final VoidCallback? onDelete;
 
   const EmployeeCard({
     super.key,
     required this.empleado,
     required this.onPagar,
+    this.onDelete,
   });
 
   @override
@@ -74,9 +76,21 @@ class EmployeeCard extends StatelessWidget {
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: onPagar,
-              child: const Text('Pagar'),
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: onPagar,
+                  child: const Text('Pagar'),
+                ),
+                if (onDelete != null) ...[
+                  const SizedBox(height: 4),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, size: 20),
+                    color: AppColors.red,
+                    onPressed: onDelete,
+                  ),
+                ],
+              ],
             ),
           ],
         ),
