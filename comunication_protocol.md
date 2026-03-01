@@ -1,70 +1,80 @@
 # RESTful API Communication Protocol - SOLO PASTAS
 
-This document defines the communication standards between the **Flutter** mobile client and the **FastAPI** server for the "SOLO PASTAS" restaurant management system.
+This document defines the communication standards between the **Flutter** mobile client and the **Node.js/Express** server for the "SOLO PASTAS" restaurant management system.
 
 ## 1. General Configuration
-- **Base URL:** `http://localhost:8000/api/v1` (Development)
+- **Base URL:** `http://localhost:8000/api/v1` (Development). Use `--dart-define=API_HOST=<ip>` for LAN/device.
 - **Data Format:** `application/json`
-- [cite_start]**Authentication:** Simple Header-based PIN authentication (`X-App-PIN`)[cite: 21].
-- [cite_start]**Persistence:** SQLite database[cite: 24].
+- **Authentication:** Simple Header-based PIN authentication (`X-App-PIN`).
+- **Persistence:** SQLite database (better-sqlite3).
 
 ## 2. API Endpoints
 
-### 2.1 Módulo de Menú y Precios
-[cite_start]Allows management of products and categories[cite: 4].
+### 2.1 Módulo de Gastos
+Handles supplies and service payments.
 
-* **GET `/productos`**
-    * [cite_start]**Description:** Retrieves the full menu organized by categories[cite: 7, 68].
-    * **Response (200 OK):** List of products with `id_producto`, `nombre`, `precio_venta`, and `estado`.
-
-* **PUT `/productos/{id}`**
-    * [cite_start]**Description:** Updates the price or availability status of an item[cite: 6].
-    * [cite_start]**Request Body:** `{ "precio_venta": decimal, "estado": boolean }`[cite: 37, 39].
-    * [cite_start]**UI Action:** Triggered by editing the input or tapping the **Switch (Disponible/Agotado)**[cite: 111, 130].
-
----
-
-### 2.2 Módulo de Gastos
-[cite_start]Handles supplies and service payments[cite: 8].
+* **GET `/gastos?fecha=YYYY-MM-DD`**
+    * **Description:** Retrieves all expenses for a given date, sorted by time descending.
+    * **Response (200 OK):** List of gastos with `id_gasto`, `descripcion`, `monto`, `tipo_gasto`, `fecha`, `hora`.
 
 * **POST `/gastos`**
-    * [cite_start]**Description:** Registers a new expense entry[cite: 9, 10].
-    * [cite_start]**Request Body:** `{ "descripcion": string, "monto": decimal, "tipo_gasto": string }`[cite: 44, 45, 47].
-    * [cite_start]**UI Action:** Triggered by tapping the **[ Registrar Gasto ]** button[cite: 121, 125].
+    * **Description:** Registers a new expense entry.
+    * **Request Body:** `{ "descripcion": string, "monto": decimal, "tipo_gasto": string }`
+    * Valid `tipo_gasto` values: `Insumo`, `Servicio`, `Otros`
+    * **UI Action:** Triggered by tapping the **[ Registrar Gasto ]** button.
 
 ---
 
-### 2.3 Módulo de Capital Humano
-[cite_start]Manages personnel and payroll payments[cite: 11].
+### 2.2 Módulo de Capital Humano
+Manages personnel and payroll payments.
 
 * **GET `/personal`**
-    * [cite_start]**Description:** Retrieves all employees and their **Sueldo pendiente**[cite: 12, 149].
-    * **Response (200 OK):** List of employees with `id_personal`, `nombre`, `cargo`, and last payment date.
+    * **Description:** Retrieves all employees with their pending salary and last payment date.
+    * **Response (200 OK):** List of employees with `id_personal`, `nombre`, `cargo`, `sueldo_pendiente`, `ultimo_pago`.
+
+* **POST `/personal`**
+    * **Description:** Creates a new employee.
+    * **Request Body:** `{ "nombre": string, "cargo": string, "sueldo_base": decimal }`
+
+* **DELETE `/personal/{id}`**
+    * **Description:** Deletes an employee and their associated payments.
+
+* **GET `/pagos?fecha=YYYY-MM-DD`**
+    * **Description:** Retrieves all payroll payments for a given date, with employee name joined.
+    * **Response (200 OK):** List of pagos with `id_pago`, `id_personal`, `monto_pagado`, `concepto`, `fecha`, `nombre_empleado`.
 
 * **POST `/pagos`**
-    * [cite_start]**Description:** Records a money transfer to an employee[cite: 13, 54].
-    * [cite_start]**Request Body:** `{ "id_personal": int, "monto_pagado": decimal, "concepto": string }`[cite: 56, 57, 59].
-    * [cite_start]**UI Action:** Triggered by tapping the **[ Pagar ]** button[cite: 147, 159].
+    * **Description:** Records a money transfer to an employee.
+    * **Request Body:** `{ "id_personal": int, "monto_pagado": decimal, "concepto": string }`
+    * Valid `concepto` values: `Sueldo`, `Adelanto`, `Bono`
+    * **UI Action:** Triggered by tapping the **[ Pagar ]** button.
 
 ---
 
-### 2.4 Módulo de Finanzas (Cierre de Caja)
-[cite_start]Finalizes the daily operations and calculates profit[cite: 14].
+### 2.3 Módulo de Finanzas (Cierre de Caja)
+Finalizes the daily operations and calculates profit.
+
+* **GET `/cierres?fecha=YYYY-MM-DD`**
+    * **Description:** Retrieves all closures for a given date.
+    * **Response (200 OK):** List of cierres with `id_cierre`, `ingresos_ventas`, `total_gastos`, `total_pagos`, `utilidad_neta`, `fecha`.
+
+* **GET `/cierres/resumen-dia?fecha=YYYY-MM-DD`**
+    * **Description:** Returns aggregated expense and payment totals for the day.
+    * **Response (200 OK):** `{ "fecha": string, "total_gastos": decimal, "total_pagos": decimal }`
 
 * **POST `/cierres`**
-    * [cite_start]**Description:** Generates the **Cierre de Caja** for the current date[cite: 15, 60].
-    * [cite_start]**Request Body:** `{ "ingresos_ventas": decimal, "fecha": string }`[cite: 63, 64].
-    * [cite_start]**Logic:** The server automatically aggregates all expenses and payroll for the date to calculate **Utilidad Neta**[cite: 16, 66].
-    * [cite_start]**UI Action:** Triggered by the **[ Cerrar Caja y Guardar ]** button[cite: 189].
+    * **Description:** Generates the **Cierre de Caja** for the current date.
+    * **Request Body:** `{ "ingresos_ventas": decimal, "fecha": string }`
+    * **Logic:** The server automatically aggregates all expenses and payroll for the date to calculate **Utilidad Neta**.
+    * **UI Action:** Triggered by the **[ Cerrar Caja y Guardar ]** button.
 
 ## 3. Error Handling
-The server must return standard HTTP status codes:
+The server returns standard HTTP status codes:
 - **400 Bad Request:** Missing fields or validation errors (e.g., negative amounts).
-- [cite_start]**401 Unauthorized:** Invalid or missing PIN[cite: 21].
-- [cite_start]**409 Conflict:** Referential integrity issues (e.g., trying to delete a category with active products)[cite: 72].
+- **401 Unauthorized:** Invalid or missing PIN.
+- **404 Not Found:** Resource not found (e.g., employee does not exist).
 - **500 Internal Server Error:** Database or server-side logic failure.
 
 ## 4. Technical Constraints
-- [cite_start]All currency values must be handled as **Decimal(10,2)** or integers (cents) to avoid rounding errors[cite: 73].
+- All currency values must be handled as **Decimal(10,2)** to avoid rounding errors.
 - Dates must follow the ISO 8601 format (`YYYY-MM-DD`).
-

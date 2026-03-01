@@ -39,16 +39,29 @@ class ReportesProvider extends ChangeNotifier {
   }
 
   Future<void> loadResumenDia(String fecha) async {
+    _loading = true;
+    notifyListeners();
+
     try {
-      final data = await _service.getResumenDia(fecha);
+      final resumenFuture = _service.getResumenDia(fecha);
+      final cierresFuture = _service.getCierresHoy(fecha);
+
+      final data = await resumenFuture;
       _totalGastos = Decimal.parse(data['total_gastos'].toString());
       _totalPagos = Decimal.parse(data['total_pagos'].toString());
       _calcularUtilidad();
-      notifyListeners();
+
+      final cierresData = await cierresFuture;
+      _historial.clear();
+      for (final j in cierresData) {
+        _historial.add(Cierre.fromJson(j));
+      }
     } catch (e) {
       _error = e.toString();
-      notifyListeners();
     }
+
+    _loading = false;
+    notifyListeners();
   }
 
   void _calcularUtilidad() {

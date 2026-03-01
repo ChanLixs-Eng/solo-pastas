@@ -68,6 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            if (dashboard.error != null)
+              _ErrorBanner(
+                message: dashboard.error!,
+                onRetry: _loadActivity,
+              ),
             // Summary card
             _SummaryCard(
               utilidad: dashboard.utilidadHoy,
@@ -195,6 +200,42 @@ class _SummaryCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// --- Error Banner ---
+
+class _ErrorBanner extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _ErrorBanner({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.red.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Error al cargar datos',
+              style: TextStyle(color: AppColors.red, fontSize: 14),
+            ),
+          ),
+          TextButton(
+            onPressed: onRetry,
+            child: const Text('Reintentar'),
+          ),
+        ],
       ),
     );
   }

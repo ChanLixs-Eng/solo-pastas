@@ -2,20 +2,15 @@
 
 [cite_start]This document describes the specific actions the system must perform to satisfy the owner's management needs [cite: 2-3].
 
-## 1. Menu Management Module (Catálogo)
-* [cite_start]**RF01 - Gestión de Productos**: The system must allow for registering, editing, and disabling dishes (**Pastas**) and drinks (**Refrescos**) [cite: 4-5].
-* [cite_start]**RF02 - Control de Precios**: The system must allow for the immediate update of the public sale price for any product in the **Menú**[cite: 6].
-* [cite_start]**RF03 - Categorización**: The system must organize the **Menú** by categories (e.g., **Pastas Largas**, **Pastas Cortas**, **Refrescos**, **Postres**) to facilitate mobile navigation[cite: 7].
-
-## 2. Expenses and Logistics Module (Gastos)
+## 1. Expenses and Logistics Module (Gastos)
 * [cite_start]**RF04 - Registro de Insumos**: The system must allow for recording daily raw material purchases (**Harina**, **Queso**, **Tomate**, etc.), including description, amount paid, and date [cite: 8-9].
 * [cite_start]**RF05 - Gestión de Cuentas (Gastos Fijos/Variables)**: The system must allow for the registration of service payments (**Luz**, **Agua**, **Gas**, **Alquiler**) separate from kitchen supplies[cite: 10].
 
-## 3. Human Capital Module (Personal)
+## 2. Human Capital Module (Personal)
 * [cite_start]**RF06 - Registro de Personal**: The system must store basic employee information and their agreed **Sueldo base** [cite: 11-12].
 * [cite_start]**RF07 - Control de Pagos al Personal**: The system must allow for recording every time money is given to an employee (**Sueldos**, **Adelantos**, or **Bonos**), automatically deducting it from the balance[cite: 13].
 
-## 4. Finance and Control Module
+## 3. Finance and Control Module
 * [cite_start]**RF08 - Cierre de Caja Diario**: The system must allow the owner to enter the total daily sales (**Efectivo + Transferencias**) to contrast them against registered expenses [cite: 14-15].
 * **RF09 - Cálculo de Utilidad Neta**: The system must automatically calculate real profit using the following formula: 
   [cite_start]**Utilidad = Ingresos Totales - (Insumos + Gastos + Pagos Personal)**[cite: 16].
@@ -27,7 +22,7 @@
 
 | Action (**Acción**) | Data Input (**Entrada de Datos**) | Output / Result (**Salida/Resultado**) |
 | :--- | :--- | :--- |
-| **Cambiar precio** | New numerical value | **Menú** updated |
+| **Registrar gasto** | Description + Amount + Type | Entry in daily expenses |
 | **Registrar compra** | Concept + Amount | Reduction in available balance |
 | **Pagar sueldo** | Selection of employee + Amount | Entry in **Historial de nómina** |
 | **Cerrar caja** | **Ventas brutas** of the day | **Reporte de ganancia limpia** |

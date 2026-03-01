@@ -1,0 +1,13 @@
+.DS_Store
+*.db
+
+# Server
+server/node_modules/
+
+# Flutter/Dart
+client/.dart_tool/
+client/.packages
+client/build/
+client/.flutter-plugins
+client/.flutter-plugins-dependencies
+client/pubspec.lock
