@@ -40,6 +40,7 @@ class ReportesProvider extends ChangeNotifier {
 
   Future<void> loadResumenDia(String fecha) async {
     _loading = true;
+    _error = null;
     notifyListeners();
 
     try {

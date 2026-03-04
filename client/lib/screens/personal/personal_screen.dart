@@ -1,7 +1,9 @@
 import 'package:decimal/decimal.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../config/theme.dart';
+import '../../providers/dashboard_provider.dart';
 import '../../providers/personal_provider.dart';
 import '../../widgets/employee_card.dart';
 import '../../widgets/pago_dialog.dart';
@@ -145,6 +147,7 @@ class _PersonalScreenState extends State<PersonalScreen> {
             empleado: emp,
             onPagar: () async {
               final messenger = ScaffoldMessenger.of(context);
+              final dashboard = context.read<DashboardProvider>();
               final result = await showModalBottomSheet<Map<String, dynamic>>(
                 context: context,
                 isScrollControlled: true,
@@ -160,6 +163,8 @@ class _PersonalScreenState extends State<PersonalScreen> {
                   concepto: result['concepto'] as String,
                 );
                 if (ok && mounted) {
+                  final fecha = DateFormat('yyyy-MM-dd').format(DateTime.now());
+                  dashboard.loadTodayActivity(fecha);
                   messenger.showSnackBar(
                     const SnackBar(
                       content: Text('Pago registrado'),

@@ -48,11 +48,12 @@ class DashboardProvider extends ChangeNotifier {
           .map((j) => ActivityItem.fromPago(j))
           .toList();
 
-      _actividadHoy = [...gastos, ...pagos];
+      _actividadHoy = [...gastos, ...pagos]
+        ..sort((a, b) => (b.hora ?? '').compareTo(a.hora ?? ''));
 
-      // Compute gastos total from real data
+      // Compute gastos total (expenses only, not pagos)
       _gastosPendientes = Decimal.zero;
-      for (final item in _actividadHoy) {
+      for (final item in gastos) {
         _gastosPendientes += item.monto;
       }
 

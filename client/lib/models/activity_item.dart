@@ -32,6 +32,7 @@ class ActivityItem {
       type: ActivityType.pago,
       descripcion: json['nombre_empleado'] as String,
       monto: Decimal.parse(json['monto_pagado'].toString()),
+      hora: json['hora'] as String?,
       subtipo: json['concepto'] as String?,
     );
   }

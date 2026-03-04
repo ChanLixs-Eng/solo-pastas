@@ -31,6 +31,7 @@ db.exec(`
     monto_pagado TEXT NOT NULL,
     concepto TEXT NOT NULL CHECK(concepto IN ('Sueldo', 'Adelanto', 'Bono')),
     fecha TEXT NOT NULL,
+    hora TEXT NOT NULL DEFAULT '00:00:00',
     FOREIGN KEY (id_personal) REFERENCES personal(id_personal)
   );
 
