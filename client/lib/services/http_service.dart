@@ -57,13 +57,10 @@ class HttpService {
       if (response.body.isEmpty) return null;
       return jsonDecode(response.body);
     }
-    final message = response.body.isNotEmpty
-        ? jsonDecode(response.body)['detail'] ?? 'Error del servidor'
-        : 'Error ${response.statusCode}';
-    throw ApiException(response.statusCode, message.toString());
+    final body = response.body.isNotEmpty ? jsonDecode(response.body) : {};
+    final message = body['error'] ?? 'Error ${response.statusCode}';
+    throw ApiException(response.statusCode, message);
   }
-
-  void dispose() => _client.close();
 }
 
 class ApiException implements Exception {
