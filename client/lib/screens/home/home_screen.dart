@@ -68,6 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            if (dashboard.loading)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              ),
             if (dashboard.error != null)
               _ErrorBanner(
                 message: dashboard.error!,
@@ -125,7 +130,17 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 12),
             _RecentActivityList(items: dashboard.actividadHoy),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
+            Center(
+              child: Text(
+                '\u00a9 2026 ChanLixs-Eng. Todos los derechos reservados.',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.greyText,
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
           ],
         ),
       ),

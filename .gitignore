@@ -3,6 +3,8 @@
 
 # Server
 server/node_modules/
+server/.env
+server/backups/
 
 # Flutter/Dart
 client/.dart_tool/
