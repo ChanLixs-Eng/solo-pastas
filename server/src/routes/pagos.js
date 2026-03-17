@@ -67,11 +67,21 @@ router.post('/', (req, res, next) => {
     const fecha = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const hora = now.toTimeString().split(' ')[0];
 
-    db.prepare(
+    const result = db.prepare(
       'INSERT INTO pagos (id_personal, monto_pagado, concepto, fecha, hora) VALUES (?, ?, ?, ?, ?)'
     ).run(id_personal, montoDecimal.toFixed(2), concepto, fecha, hora);
 
-    res.json({});
+    const empleadoInfo = db.prepare('SELECT nombre FROM personal WHERE id_personal = ?').get(id_personal);
+
+    res.status(201).json({
+      id_pago: result.lastInsertRowid,
+      id_personal,
+      monto_pagado: montoDecimal.toFixed(2),
+      concepto,
+      fecha,
+      hora,
+      nombre_empleado: empleadoInfo.nombre,
+    });
   } catch (err) {
     next(err);
   }

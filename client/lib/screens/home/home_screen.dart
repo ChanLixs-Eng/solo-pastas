@@ -77,6 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
             _SummaryCard(
               utilidad: dashboard.utilidadHoy,
               gastos: dashboard.gastosPendientes,
+              pagos: dashboard.pagosPendientes,
+              hasCierre: dashboard.hasCierre,
             ),
             const SizedBox(height: 24),
             // Quick actions
@@ -136,68 +138,91 @@ class _HomeScreenState extends State<HomeScreen> {
 class _SummaryCard extends StatelessWidget {
   final Decimal utilidad;
   final Decimal gastos;
+  final Decimal pagos;
+  final bool hasCierre;
 
-  const _SummaryCard({required this.utilidad, required this.gastos});
+  const _SummaryCard({
+    required this.utilidad,
+    required this.gastos,
+    required this.pagos,
+    required this.hasCierre,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isPositive = utilidad >= Decimal.zero;
     final sign = isPositive ? '+ ' : '- ';
     final utilidadAbs = isPositive ? utilidad : -utilidad;
+    final totalEgresos = gastos + pagos;
 
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(20),
-        child: Row(
+        child: Column(
           children: [
-            // Left: utilidad
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$sign Bs. ${utilidadAbs.toStringAsFixed(2)}',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: isPositive ? AppColors.green : AppColors.red,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Utilidad Hoy',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: AppColors.greyText,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Right: gastos
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+            Row(
               children: [
-                Text(
-                  '- Bs. ${gastos.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.orange,
+                // Left: utilidad
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '$sign Bs. ${utilidadAbs.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: isPositive ? AppColors.green : AppColors.red,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        hasCierre ? 'Utilidad Hoy' : 'Egresos del Día',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.greyText,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Gastos del Día',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.greyText,
-                  ),
+                // Right: total egresos
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '- Bs. ${totalEgresos.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.orange,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Total Egresos',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.greyText,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
+            if (!hasCierre) ...[
+              const SizedBox(height: 8),
+              Text(
+                'Caja abierta — cierra caja para ver utilidad',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.greyText,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
           ],
         ),
       ),
